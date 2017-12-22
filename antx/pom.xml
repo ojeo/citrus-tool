@@ -12,7 +12,7 @@
     <artifactId>antx-parent</artifactId>
     <packaging>pom</packaging>
     <name>Antx Parent Project</name>
-    <version>1.2</version>
+    <version>1.2.1</version>
     <properties>
         <antx.version>1.2</antx.version>
     </properties>
