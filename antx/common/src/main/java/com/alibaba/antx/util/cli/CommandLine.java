@@ -126,7 +126,7 @@ public class CommandLine {
      */
     public String getOptionValue(String opt) {
         String[] values = getOptionValues(opt);
-        return values == null ? null : values[0];
+        return values == null ? null : values[0].trim();
     }
 
     /**
