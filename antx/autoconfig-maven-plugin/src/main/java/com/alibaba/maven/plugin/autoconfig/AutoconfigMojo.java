@@ -20,8 +20,10 @@ package com.alibaba.maven.plugin.autoconfig;
 import java.io.File;
 
 import com.alibaba.antx.config.ConfigRuntimeImpl;
+import com.alibaba.antx.config.cli.CLIManager;
 import com.alibaba.antx.expand.ExpanderRuntimeImpl;
 import com.alibaba.antx.util.CharsetUtil;
+import com.alibaba.antx.util.StringUtil;
 import com.alibaba.citrus.logconfig.LogConfigurator;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -115,6 +117,15 @@ public class AutoconfigMojo extends AbstractMojo {
      */
     private Patterns packages;
 
+
+    /**
+     * shared properties file.
+     *
+     * @parameter expression="${autoconfig.sharedProperties}"
+     */
+    private String sharedProperties;
+
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (skip) {
             return;
@@ -160,6 +171,14 @@ public class AutoconfigMojo extends AbstractMojo {
 
             if (userProperties != null) {
                 runtimeImpl.setUserPropertiesFile(userProperties.getAbsolutePath(), null);
+            }
+
+            if(sharedProperties!=null ){
+                getLog().info("-------------------------------------------------");
+                getLog().info("sharedPropertiesFiles: " + sharedProperties);
+                String[] sharedPropertiesFiles = StringUtil.split(sharedProperties);
+
+                runtimeImpl.setSharedPropertiesFiles(sharedPropertiesFiles, "", charset);
             }
 
             getLog().info(
