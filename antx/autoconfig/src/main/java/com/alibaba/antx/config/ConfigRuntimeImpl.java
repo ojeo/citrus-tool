@@ -213,9 +213,9 @@ public class ConfigRuntimeImpl implements ConfigRuntime {
             resource.setCharset(charset);
         }
 
-        if (!StringUtil.isEmpty(name) || sharedPropertiesFiles != null && sharedPropertiesFiles.length > 0) {
-            this.interactiveMode = ConfigConstant.INTERACTIVE_ON;
-        }
+        //if (!StringUtil.isEmpty(name) || sharedPropertiesFiles != null && sharedPropertiesFiles.length > 0) {
+        //    this.interactiveMode = ConfigConstant.INTERACTIVE_ON;
+        //}
     }
 
     public void setVerbose() {
