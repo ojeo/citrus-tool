@@ -42,6 +42,8 @@ import java.util.regex.Pattern;
 import com.alibaba.antx.config.ConfigException;
 import com.alibaba.antx.config.descriptor.ConfigDescriptor;
 import com.alibaba.antx.config.descriptor.ConfigGenerate;
+import com.alibaba.antx.config.descriptor.ConfigGroup;
+import com.alibaba.antx.config.descriptor.ConfigProperty;
 import com.alibaba.antx.config.props.PropertiesSet;
 import com.alibaba.antx.util.StreamUtil;
 import com.alibaba.antx.util.StringUtil;
@@ -54,6 +56,7 @@ import org.apache.velocity.context.Context;
 public class ConfigGeneratorSession {
     protected final ConfigGenerator               generator;
     protected final Map                           props;
+    protected final Map                           defaultProps;
     private final   Map<String, Object[]>         descriptorLogs;
     private final   Set<String>                   processedDestfiles;
     private final   Map<String, LazyGenerateItem> lazyGenerateItems;
@@ -65,6 +68,7 @@ public class ConfigGeneratorSession {
         this.generator = generator;
         this.props = propSet.getMergedProperties();
         this.descriptorLogs = new HashMap<String, Object[]>();
+        this.defaultProps = new HashMap<String, Object>();
         this.processedDestfiles = new HashSet<String>();
         this.lazyGenerateItems = new HashMap<String, LazyGenerateItem>();
 
@@ -78,6 +82,16 @@ public class ConfigGeneratorSession {
             PrintWriter log = new PrintWriter(logBuffer, true);
 
             descriptorLogs.put(descriptorName, new Object[] { logBuffer, log, descriptor });
+
+            ConfigGroup[] groups = descriptor.getGroups();
+            for (ConfigGroup group : groups) {
+                ConfigProperty[] properties = group.getProperties();
+                for (ConfigProperty property : properties) {
+                    if(property.getName()!=null && property.getDefaultValue()!=null ){
+                        defaultProps.put(StringUtil.getValidIdentifier(property.getName()),property.getDefaultValue());
+                    }
+                }
+            }
 
             // 初始日志内容
             log.println("Last Configured at: " + now);
@@ -133,14 +147,16 @@ public class ConfigGeneratorSession {
             public Object internalGet(String key) {
                 if (descriptorProps.containsKey(key)) {
                     return descriptorProps.get(key);
-                } else {
+                } else if(props.containsKey(key)){
                     return PropertiesLoader.evaluate(key, props);
+                }else{
+                    return defaultProps.get(key);
                 }
             }
 
             @Override
             public boolean internalContainsKey(Object key) {
-                return descriptorProps.containsKey(key) || props.containsKey(key);
+                return descriptorProps.containsKey(key) || props.containsKey(key) || defaultProps.containsKey(key);
             }
         };
 
